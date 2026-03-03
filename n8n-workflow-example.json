@@ -1,0 +1,83 @@
+{
+  "name": "HR Report Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://hr-report-api:8000/generate-report-from-server",
+        "options": {
+          "response": {
+            "responseFormat": "file"
+          }
+        }
+      },
+      "id": "http-request",
+      "name": "Generate HR Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "to": "hr@company.com",
+        "subject": "HR Отчет за месяц",
+        "attachments": "={{ $binary.data }}",
+        "attachmentsUi": {
+          "attachmentsBinary": [
+            {
+              "property": "data"
+            }
+          ]
+        }
+      },
+      "id": "email-send",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate HR Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate HR Report": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+
+

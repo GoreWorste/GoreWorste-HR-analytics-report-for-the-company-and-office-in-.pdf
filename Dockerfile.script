@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Установка системных зависимостей для работы с Excel и шрифтами
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fontconfig fonts-dejavu-core \
+ && rm -rf /var/lib/apt/lists/*
+
+# Копирование requirements.txt и установка зависимостей
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копирование всего проекта
+COPY . .
+
+# Создание директории для входных данных
+RUN mkdir -p /app/data
+
+# По умолчанию запускаем скрипт count_terms.py
+# Путь к файлу можно передать через переменную окружения DATA_FILE_PATH
+# или через аргумент командной строки
+CMD ["python", "TestCheck/count_terms.py"]
+
+
+
+
+
